@@ -7,15 +7,17 @@ from stock_predictor.core.logger import get_logger
 
 logger = get_logger(__name__)
 
-def recommend_stocks(tickers):
+def recommend_stocks(tickers, progress_callback=None):
     """Recommends stocks based on a set of rules, fetching data concurrently."""
     recommendations = []
     
     with ThreadPoolExecutor(max_workers=10) as executor:
         future_to_ticker = {executor.submit(get_stock_data, ticker): ticker for ticker in tickers}
         
-        for future in as_completed(future_to_ticker):
+        for i, future in enumerate(as_completed(future_to_ticker)):
             ticker = future_to_ticker[future]
+            if progress_callback:
+                progress_callback(i + 1, len(tickers), ticker)
             try:
                 data = future.result()
                 if data.empty:

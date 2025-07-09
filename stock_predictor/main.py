@@ -33,7 +33,7 @@ def plot_recommendation(ticker, analysis):
     plt.legend()
     plt.show()
 
-def main():
+def main(progress_callback=None):
     """Main function to run the stock recommender."""
     logger.info("Starting stock recommendation analysis...")
     
@@ -42,24 +42,11 @@ def main():
 
     if not stock_symbols:
         logger.error("No stock symbols loaded. Exiting.")
-        return
+        return []
 
-    recommendations = recommend_stocks(stock_symbols)
+    recommendations = recommend_stocks(stock_symbols, progress_callback=progress_callback)
 
-    if not recommendations:
-        logger.info("No suitable stocks found for recommendation today.")
-        return
-
-    print("\n--- Top Stock Recommendations ---")
-    for rec in recommendations:
-        if rec['confidence'] > 75: # Apply confidence threshold
-            print(
-                f"{rec['ticker']}: Buy @ {rec['last_price']:.2f} | "
-                f"Target: {rec['target_price']:.2f} | "
-                f"Stop-Loss: {rec['stop_loss']:.2f} | "
-                f"Confidence: {rec['confidence']}%"
-            )
-            # plot_recommendation(rec['ticker'], rec) # Uncomment to see plots
+    return recommendations
 
 if __name__ == "__main__":
     main()
